@@ -1,3 +1,5 @@
+This job app is a monolithic application.
+
 ## Steps to build docker image without docker file
 
 ./mvnw spring-boot:build-image "-Dspring-boot.build-image.imageName=dockerusername/job-protal"
