@@ -10,10 +10,12 @@ import com.jobportal.jobms.job.dto.JobDTO;
 import com.jobportal.jobms.job.external.Company;
 import com.jobportal.jobms.job.external.Review;
 import com.jobportal.jobms.mapper.JobMapper;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +26,8 @@ public class JobServiceImpl implements JobService {
     JobRepository jobRepository;
     private CompanyClient companyClient;
     private ReviewClient reviewClient;
+
+    int attempt=0;
 
     @Autowired
     RestTemplate restTemplate;
@@ -36,9 +40,21 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+   // @CircuitBreaker(name = "companyBreaker",fallbackMethod = "companyBreakerFallback")
+    // @Retry(name = "companyBreaker",fallbackMethod = "companyBreakerFallback")
+    @RateLimiter(name = "companyBreaker",fallbackMethod = "companyBreakerFallback")
     public List<JobDTO> findall() {
+        System.out.println("Attempt:"+attempt);
         List<Job> jobs = jobRepository.findAll();
         return jobs.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public List<String> companyBreakerFallback(){
+        List<String> list = new ArrayList<>();
+        list.add("value1");
+        list.add("value2");
+
+        return list;
     }
 
     private JobDTO convertToDTO(Job job){
