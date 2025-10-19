@@ -85,6 +85,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://servicereg:8761/eureka
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8011
 
   reviewms:
     image: poojitak/reviewms:latest
